@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "bootstrap-icons": "^1.9.1",
     "bootswatch": "^5.2.0",
     "firebase": "^9.9.3",
     "next": "12.2.5",
@@ -16,6 +17,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.34.2",
     "react-hot-toast": "^2.3.0",
+    "react-icons": "^4.4.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

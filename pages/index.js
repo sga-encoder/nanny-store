@@ -1,7 +1,7 @@
-export default function Home () {
+const index = () => {
   return (
-    <div className='container'>
-
-    </div>
+    <div>hols</div>
   )
 }
+
+export default index

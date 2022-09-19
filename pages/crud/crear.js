@@ -1,13 +1,16 @@
 import { useState } from 'react'
-import { addImagesProduct, addProducts } from '../../lib/firebase'
-import Form from './../../components/Form'
+import { addImagesProduct, addProducts } from '../../utils/firebase'
+import Form from '../../components/Form'
 import { toast } from 'react-hot-toast'
+import { useRouter } from 'next/router'
 
 const create = () => {
   const [formData, setFormData] = useState({
-    category: '',
-    subcategory: ''
+    categoria: '',
+    subcategoria: ''
   })
+
+  const router = useRouter()
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -32,7 +35,7 @@ const create = () => {
         )
         break
       case 'error':
-        toast.error('Hello Darkness!',
+        toast.error(messages,
           {
             // icon: '👏',
             style: {
@@ -52,7 +55,7 @@ const create = () => {
 
       if (urlImages !== undefined) {
         try {
-          if (data.category === 'clothes') {
+          if (data.category === 'ropa') {
             const dataProduct = {
               category: data.category,
               cost: data.cost,
@@ -62,7 +65,7 @@ const create = () => {
               ref: data.ref,
               subcategory: data.subcategory,
               images: urlImages,
-              amount: {
+              cantidad: {
                 L: data.L,
                 M: data.M,
                 S: data.S,
@@ -72,10 +75,12 @@ const create = () => {
             }
             addProducts(dataProduct)
             toastify('El producto se agrego correctamente', 'success')
+            router.push('/')
           } else {
             const dataProduct = { ...data, images: urlImages }
             addProducts(dataProduct)
             toastify('El producto se agrego correctamente', 'success')
+            router.push('/')
           }
         } catch (e) {
           console.log(e)
@@ -95,8 +100,18 @@ const create = () => {
           functionHandleChange={handleChange}
           functionHandleSubmit={handleSubmit}
           data={formData}
+          update={false}
         />
       </div>
+      <style jsx>{`
+        div>div
+        {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+        }  
+      `}</style>
     </div>
   )
 }
