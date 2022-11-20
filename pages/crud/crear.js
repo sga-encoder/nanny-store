@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { addImagesProduct, addProducts } from '../../utils/firebase'
 import Form from '../../components/Form'
-import { toast } from 'react-hot-toast'
 import { useRouter } from 'next/router'
+import Return from '../../components/Return'
+import { toastify } from '../../utils/toastify'
 
 const create = () => {
   const [formData, setFormData] = useState({
@@ -20,67 +21,44 @@ const create = () => {
     })
   }
 
-  const toastify = (messages, type) => {
-    switch (type) {
-      case 'success':
-        toast.success(messages,
-          {
-            // icon: '👏',
-            style: {
-              borderRadius: '10px',
-              background: '#333',
-              color: '#fff'
-            }
-          }
-        )
-        break
-      case 'error':
-        toast.error(messages,
-          {
-            // icon: '👏',
-            style: {
-              borderRadius: '10px',
-              background: '#333',
-              color: '#fff'
-            }
-          }
-        )
-        break
-    }
-  }
-
   const handleSubmit = async (data) => {
     try {
       const urlImages = await addImagesProduct(data.images[0])
 
       if (urlImages !== undefined) {
         try {
-          if (data.category === 'ropa') {
+          if (data.categoria === 'ropa') {
             const dataProduct = {
-              category: data.category,
-              cost: data.cost,
-              gender: data.gender,
-              name: data.name,
-              price: data.price,
+              categoria: data.categoria,
+              costo: parseInt(data.costo),
+              genero: data.genero,
+              nombre: data.nombre,
+              precio: parseInt(data.precio),
               ref: data.ref,
-              subcategory: data.subcategory,
+              subcategoria: data.subcategoria,
               images: urlImages,
               cantidad: {
-                L: data.L,
-                M: data.M,
-                S: data.S,
-                XL: data.XL,
-                XXL: data.XXL
+                L: parseInt(data.L),
+                M: parseInt(data.M),
+                S: parseInt(data.S),
+                XL: parseInt(data.XL),
+                XXL: parseInt(data.XXL)
               }
             }
             addProducts(dataProduct)
             toastify('El producto se agrego correctamente', 'success')
-            router.push('/')
+            router.push('/crud')
           } else {
-            const dataProduct = { ...data, images: urlImages }
+            const dataProduct = {
+              ...data,
+              images: urlImages,
+              costo: parseInt(data.costo),
+              precio: parseInt(data.precio),
+              cantidad: parseInt(data.cantidad)
+            }
             addProducts(dataProduct)
             toastify('El producto se agrego correctamente', 'success')
-            router.push('/')
+            router.push('/crud')
           }
         } catch (e) {
           console.log(e)
@@ -112,6 +90,7 @@ const create = () => {
           flex-direction: column;
         }  
       `}</style>
+      <Return href='/crud' />
     </div>
   )
 }

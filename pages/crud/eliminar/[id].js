@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { deleteProduct } from '../../../utils/firebase'
+import { toastify } from '../../../utils/toastify'
 
 const eliminar = () => {
   const router = useRouter()
@@ -15,12 +16,20 @@ const eliminar = () => {
       <div className="card">
         <img src={url} className="card-img-top"/>
         <div className="card-body">
-          <p className="card-text text-center">Estas seguro de que quieres eliminar este producto</p>
+          <p className="card-text text-center">
+            Estas seguro de que quieres eliminar este producto
+          </p>
           <div>
-            <button className="btn btn-danger container-2" onClick={() => { deleteProduct(id, url); router.push('/') }}>
+            <button
+              className="btn btn-danger container-2"
+              onClick={() => {
+                deleteProduct(id, url)
+                toastify('El procucto se a eliminado correctamente', 'success')
+                router.push('/crud')
+              }}>
               Elimininar
             </button>
-            <Link href={'/'}>
+            <Link href={'/crud'}>
               <a className='btn btn-dark m-2'>
                 Cancelar
               </a>

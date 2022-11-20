@@ -1,8 +1,9 @@
 import { useRouter } from 'next/router'
 import Form from '../../../components/Form'
 import { useEffect, useState } from 'react'
-import { getProduct, addImagesProduct, updateProduct, deleteImages } from '../../../utils/firebase'
-import { toast } from 'react-hot-toast'
+import { getDocument, docProducts, addImagesProduct, updateProduct, deleteImages } from '../../../utils/firebase'
+import { toastify } from '../../utils/toastify'
+import Return from '../../../components/Return'
 
 const actualizar = () => {
   const router = useRouter()
@@ -11,7 +12,7 @@ const actualizar = () => {
   const [product, setProduct] = useState({})
 
   const readProduct = async () => {
-    const data = await getProduct(id)
+    const data = await getDocument(docProducts, id)
     setProduct(data)
   }
 
@@ -32,35 +33,6 @@ const actualizar = () => {
     })
   }
 
-  const toastify = (messages, type) => {
-    switch (type) {
-      case 'success':
-        toast.success(messages,
-          {
-            // icon: '👏',
-            style: {
-              borderRadius: '10px',
-              background: '#333',
-              color: '#fff'
-            }
-          }
-        )
-        break
-      case 'error':
-        toast.error(messages,
-          {
-            // icon: '👏',
-            style: {
-              borderRadius: '10px',
-              background: '#333',
-              color: '#fff'
-            }
-          }
-        )
-        break
-    }
-  }
-
   const handleSubmit = async (data) => {
     console.log(typeof data.images[0])
 
@@ -71,32 +43,32 @@ const actualizar = () => {
 
         if (urlImages !== undefined) {
           try {
-            if (data.category === 'ropa') {
+            if (data.categoria === 'ropa') {
               const dataProduct = {
                 categoria: data.categoria,
-                costo: data.costo,
+                costo: parseInt(data.costo),
                 genero: data.genero,
                 nombre: data.nombre,
-                precio: data.precio,
+                precio: parseInt(data.precio),
                 ref: data.ref,
                 subcategoria: data.subcategoria,
                 images: urlImages,
                 cantidad: {
-                  L: data.L,
-                  M: data.M,
-                  S: data.S,
-                  XL: data.XL,
-                  XXL: data.XXL
+                  L: parseInt(data.L),
+                  M: parseInt(data.M),
+                  S: parseInt(data.S),
+                  XL: parseInt(data.XL),
+                  XXL: parseInt(data.XXL)
                 }
               }
               updateProduct(dataProduct, id)
               toastify('El producto se actualizar correctamente', 'success')
-              router.push('/')
+              router.push('/crud')
             } else {
               const dataProduct = { ...data, images: urlImages }
               updateProduct(dataProduct, id)
               toastify('El producto se actualizar correctamente', 'success')
-              router.push('/')
+              router.push('/crud')
             }
           } catch (e) {
             console.log(e)
@@ -108,31 +80,31 @@ const actualizar = () => {
       }
     } else {
       try {
-        if (data.category === 'ropa') {
+        if (data.categoria === 'ropa') {
           const dataProduct = {
             categoria: data.categoria,
-            costo: data.costo,
+            costo: parseInt(data.costo),
             genero: data.genero,
             nombre: data.nombre,
-            precio: data.precio,
+            precio: parseInt(data.precio),
             ref: data.ref,
             subcategoria: data.subcategoria,
             images: data.images,
             cantidad: {
-              L: data.L,
-              M: data.M,
-              S: data.S,
-              XL: data.XL,
-              XXL: data.XXL
+              L: parseInt(data.L),
+              M: parseInt(data.M),
+              S: parseInt(data.S),
+              XL: parseInt(data.XL),
+              XXL: parseInt(data.XXL)
             }
           }
           updateProduct(dataProduct, id)
           toastify('El producto se actualizar correctamente', 'success')
-          router.push('/')
+          router.push('/crud')
         } else {
           updateProduct(data, id)
           toastify('El producto se actualizar correctamente', 'success')
-          router.push('/')
+          router.push('/crud')
         }
       } catch (e) {
         console.log(e)
@@ -166,6 +138,7 @@ const actualizar = () => {
           flex-direction: column;
         }  
       `}</style>
+      <Return href='/crud' />
     </div>
 
   )
