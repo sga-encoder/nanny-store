@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react'
 import { getCollection, docProducts, addBill, getNumberBill } from '../../../utils/firebase'
 import { FiSearch } from 'react-icons/fi'
 import Popup from 'reactjs-popup'
-import Return from './../../../components/Return'
+import Return from '../../../components/Return'
+import { useRouter } from 'next/router'
+import { toastify } from '../../../utils/toastify'
+import { zeroAdd } from '../../../utils/zeroAdd'
 
 const index = () => {
   const [products, setProducts] = useState([])
@@ -15,6 +18,8 @@ const index = () => {
   const [size, setSize] = useState('U')
   const [numberBill, setNumberBill] = useState('0000')
 
+  const router = useRouter()
+
   useEffect(() => {
     readData()
   }, [])
@@ -23,19 +28,7 @@ const index = () => {
     const dataProducts = await getCollection(docProducts)
     setProducts(dataProducts)
     const numberBillData = await getNumberBill()
-    setNumberBill(zeroAdd(numberBillData.numero_de_facturacion + 1))
-  }
-
-  const zeroAdd = (number) => {
-    if (number <= 9) {
-      return '000' + number
-    } else if (number <= 99) {
-      return '00' + number
-    } else if (number <= 999) {
-      return '0' + number
-    } else if (number <= 9999) {
-      return number
-    }
+    setNumberBill(zeroAdd(numberBillData.numeroDeFacturacion + 1))
   }
 
   const filter = (terminoBusqueda) => {
@@ -378,7 +371,9 @@ const index = () => {
         <button
           className="btn btn-primary btn-lg"
           onClick={() => {
-            addBill(listProducts, { ...dataBill, numero_de_facturacion: parseInt(numberBill) })
+            addBill(listProducts, { ...dataBill, numeroDeFacturacion: parseInt(numberBill) })
+            router.push('/fac')
+            toastify('Se Creo La factura correctamente', 'success')
           }}
         >
           Crear Factura

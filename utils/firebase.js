@@ -5,14 +5,14 @@ import app from '../lib/firebase'
 
 export const db = getFirestore(app)
 export const storage = getStorage(app)
-export const docProducts = 'products'
+export const docProducts = 'productos'
 export const docBills = 'facturas'
 export const varNumberBill = ['variables', 'facturas']
 
 // -------------------------------------------------
 // -                                               -
 // -                  Generales                    -
-// -                                               -
+// -                               v                -
 // -------------------------------------------------
 export const getCollection = async (collections) => {
   const docRef = collection(db, collections)
@@ -48,7 +48,12 @@ export const getDocument = async (collections, id) => {
 export const addProducts = async (data) => {
   try {
     const docRef = collection(db, docProducts)
-    const docSnap = await addDoc(docRef, data)
+    const docSnap = await addDoc(docRef, {
+      ...data,
+      ultimaModificacion: serverTimestamp(),
+      fechaDeCreacion: serverTimestamp(),
+      historialDeVentas: []
+    })
     console.log('se agrego un producto con el ID: ', docSnap.id)
   } catch (e) {
     console.error('Error en el servicio: ', e)
@@ -70,7 +75,7 @@ export const increaseQuantity = async (data) => {
   const docRef = doc(db, docProducts, data.id)
   if (data.incrementar === 0) {
     await updateDoc(docRef, {
-      ultima_modificacion: serverTimestamp(),
+      ultimaModificacion: serverTimestamp(),
       cantidad: {
         S: parseInt(data.S) + parseInt(data.old_S),
         M: parseInt(data.M) + parseInt(data.old_M),
@@ -81,7 +86,7 @@ export const increaseQuantity = async (data) => {
     })
   } else {
     await updateDoc(docRef, {
-      ultima_modificacion: serverTimestamp(),
+      ultimaModificacion: serverTimestamp(),
       cantidad: increment(data.incrementar)
     })
   }
@@ -177,20 +182,19 @@ export const addBill = async (data, dataBill) => {
 
     if (product[0].categoria === 'ropa') {
       updateDoc(docRef2, {
-        historial_de_ventas: [...product[0].historial_de_ventas, {
+        historialDeVentas: [...product[0].historialDeVentas, {
           // fecha_de_venta: Timestamp.fromDate(new Date().getDate()),
-          fecha_de_venta: Timestamp.fromDate(new Date()),
-          cantidad_vendida: product[1],
+          fechaDeVenta: Timestamp.fromDate(new Date()),
+          cantidadVendida: product[1],
           talla: product[2]
         }],
         cantidad: operationSize(product[2])
       })
     } else {
       updateDoc(docRef2, {
-        historial_de_ventas: [...product[0].historial_de_ventas, {
-          // fecha_de_venta: Timestamp.fromDate(new Date().getDate()),
-          fecha_de_venta: Timestamp.fromDate(new Date()),
-          cantidad_vendida: product[1]
+        historialDeVentas: [...product[0].historialDeVentas, {
+          fechaDeVenta: Timestamp.fromDate(new Date()),
+          cantidadVendida: product[1]
         }],
         cantidad: product[0].cantidad - product[1]
       })
@@ -201,8 +205,8 @@ export const addBill = async (data, dataBill) => {
     const docRef = collection(db, docBills)
     const docSnap = await addDoc(docRef, {
       ...dataBill,
-      productos_vendidos: products,
-      fecha_de_facturacion: serverTimestamp()
+      productosVendidos: products,
+      fechaDeFacturacion: serverTimestamp()
     })
 
     console.log('se agrego un producto con el ID: ', docSnap.id)
@@ -212,7 +216,7 @@ export const addBill = async (data, dataBill) => {
 
   const docRef3 = doc(db, varNumberBill[0], varNumberBill[1])
   await updateDoc(docRef3, {
-    numero_de_facturacion: dataBill.numero_de_facturacion
+    numeroDeFacturacion: dataBill.numeroDeFacturacion
   })
 
   console.log('products', products)

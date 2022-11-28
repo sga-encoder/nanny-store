@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react'
 
 const Form = ({ functionHandleChange, functionHandleSubmit, data, update }) => {
   const { register, handleSubmit, setValue } = useForm()
-
   const [getId, setGetId] = useState(false)
+  const [categoria, setCategoria] = useState('')
+  const [subcategoria, setSubcategoria] = useState('')
 
   useEffect(() => {
     if (update) {
@@ -27,8 +28,14 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, update }) => {
         setValue('XXL', data.cantidad.XXL)
       }
       setValue('genero', data.genero)
+    } else {
+      setValue('ref', `${categoria}${subcategoria}`)
     }
-  }, [getId])
+  }, [getId, categoria])
+
+  useEffect(() => {
+    setValue('ref', `${categoria}${subcategoria}`)
+  }, [categoria, subcategoria])
 
   const onSubmit = (data) => {
     functionHandleSubmit(data)
@@ -49,7 +56,7 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, update }) => {
         return (
           <>
             <option value="cuidado facial">Cuidado Facial</option>
-            <option value="otro">otro</option>
+            <option value="otros">Otros</option>
           </>
         )
 
@@ -60,7 +67,7 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, update }) => {
             <option value="polo">Polo</option>
             <option value="boxer">Boxer</option>
             <option value="medias">Medias</option>
-            <option value="otro">otro</option>
+            <option value="otros">otro</option>
           </>
         )
 
@@ -69,7 +76,7 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, update }) => {
           <>
             <option value="perfume">Perfume</option>
             <option value="splash">splash</option>
-            <option value="otro">otro</option>
+            <option value="otros">otros</option>
           </>
         )
 
@@ -82,13 +89,115 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, update }) => {
     }
   }
 
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    functionHandleChange(e)
+    if (name === 'categoria') {
+      switch (value) {
+        case 'accesorio':
+          setCategoria('AC')
+          setSubcategoria('')
+          break
+        case 'belleza':
+          setCategoria('BE')
+          setSubcategoria('')
+          break
+        case 'ropa':
+          setCategoria('RO')
+          setSubcategoria('')
+          break
+        case 'fragancia':
+          setCategoria('FR')
+          setSubcategoria('')
+          break
+        default:
+          setCategoria('')
+          setSubcategoria('')
+          break
+      }
+    } else if (name === 'subcategoria') {
+      if (categoria === 'AC') {
+        switch (value) {
+          case 'pulsera':
+            setSubcategoria('PU')
+            break
+
+          case 'llavero':
+            setSubcategoria('LA')
+            break
+
+          case 'otros':
+            setSubcategoria('OT')
+            break
+
+          default:
+            setSubcategoria('')
+            break
+        }
+      } else if (categoria === 'BE') {
+        switch (value) {
+          case 'cuidado facial':
+            setSubcategoria('CF')
+            break
+          case 'otros':
+            setSubcategoria('OT')
+            break
+
+          default:
+            setSubcategoria('')
+            break
+        }
+      } else if (categoria === 'RO') {
+        switch (value) {
+          case 'camiseta':
+            setSubcategoria('CA')
+            break
+          case 'polo':
+            setSubcategoria('PO')
+            break
+          case 'boxer':
+            setSubcategoria('BO')
+            break
+          case 'medias':
+            setSubcategoria('ME')
+            break
+          case 'otros':
+            setSubcategoria('OT')
+            break
+          default:
+            setSubcategoria('')
+            break
+        }
+      } else if (categoria === 'FR') {
+        switch (value) {
+          case 'perfume':
+            setSubcategoria('PE')
+            break
+
+          case 'splash':
+            setSubcategoria('SP')
+            break
+
+          case 'otros':
+            setSubcategoria('OT')
+            break
+
+          default:
+            setSubcategoria('')
+            break
+        }
+      }
+    }
+    setValue('ref', `${categoria}${subcategoria}`)
+  }
+
   return (
     <div className='container-2'>
       <form onSubmit={handleSubmit(onSubmit)}>
         <select
           className="form-select mt-2"
           {...register('categoria')}
-          onChange={functionHandleChange}
+          onChange={handleChange}
         >
           <option defaultValue>-- selecione la categoria --</option>
           <option value="accesorio">Accesorio</option>
@@ -100,7 +209,7 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, update }) => {
         <select
           className="form-select mt-3 mb-3"
           {...register('subcategoria')}
-          onChange={functionHandleChange}
+          onChange={handleChange}
         >
           <option defaultValue>-- selecione la subcategoria --</option>
           {switchSubcategory()}
