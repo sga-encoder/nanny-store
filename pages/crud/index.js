@@ -1,23 +1,10 @@
-import { useEffect, useState } from 'react'
 import { getCollection, docProducts } from '../../utils/firebase'
 import { BsPencil } from 'react-icons/bs'
 import { BiTrashAlt } from 'react-icons/bi'
 import Link from 'next/link'
 import Return from '../../components/Return'
 
-const Crud = () => {
-  const [products, setProducts] = useState([])
-
-  useEffect(() => {
-    readProducts()
-    console.log(products)
-  }, [])
-
-  const readProducts = async () => {
-    const data = await getCollection(docProducts)
-    setProducts(data)
-  }
-
+const Crud = ({ products }) => {
   return (
     <div className='container container-center'>
       <h2>Lista de Productos</h2>
@@ -203,6 +190,11 @@ const Crud = () => {
       `}</style>
     </div>
   )
+}
+
+export async function getServerSideProps () {
+  const products = await getCollection(docProducts)
+  return { props: { products } }
 }
 
 export default Crud

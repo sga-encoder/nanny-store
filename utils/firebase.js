@@ -1,4 +1,4 @@
-import { getFirestore, addDoc, collection, getDocs, updateDoc, getDoc, doc, deleteDoc, serverTimestamp, increment, Timestamp } from 'firebase/firestore'
+import { getFirestore, addDoc, collection, getDocs, updateDoc, getDoc, doc, deleteDoc, increment, query, where } from 'firebase/firestore'
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
 import { v4 } from 'uuid'
 import app from '../lib/firebase'
@@ -12,7 +12,7 @@ export const varNumberBill = ['variables', 'facturas']
 // -------------------------------------------------
 // -                                               -
 // -                  Generales                    -
-// -                               v                -
+// -                                               -
 // -------------------------------------------------
 export const getCollection = async (collections) => {
   const docRef = collection(db, collections)
@@ -50,8 +50,8 @@ export const addProducts = async (data) => {
     const docRef = collection(db, docProducts)
     const docSnap = await addDoc(docRef, {
       ...data,
-      ultimaModificacion: serverTimestamp(),
-      fechaDeCreacion: serverTimestamp(),
+      ultimaModificacion: new Date().toLocaleDateString(),
+      fechaDeCreacion: new Date().toLocaleDateString(),
       historialDeVentas: []
     })
     console.log('se agrego un producto con el ID: ', docSnap.id)
@@ -75,7 +75,7 @@ export const increaseQuantity = async (data) => {
   const docRef = doc(db, docProducts, data.id)
   if (data.incrementar === 0) {
     await updateDoc(docRef, {
-      ultimaModificacion: serverTimestamp(),
+      ultimaModificacion: new Date().toLocaleDateString(),
       cantidad: {
         S: parseInt(data.S) + parseInt(data.old_S),
         M: parseInt(data.M) + parseInt(data.old_M),
@@ -86,7 +86,7 @@ export const increaseQuantity = async (data) => {
     })
   } else {
     await updateDoc(docRef, {
-      ultimaModificacion: serverTimestamp(),
+      ultimaModificacion: new Date().toLocaleDateString(),
       cantidad: increment(data.incrementar)
     })
   }
@@ -183,8 +183,7 @@ export const addBill = async (data, dataBill) => {
     if (product[0].categoria === 'ropa') {
       updateDoc(docRef2, {
         historialDeVentas: [...product[0].historialDeVentas, {
-          // fecha_de_venta: Timestamp.fromDate(new Date().getDate()),
-          fechaDeVenta: Timestamp.fromDate(new Date()),
+          fechaDeVenta: new Date().toLocaleDateString(),
           cantidadVendida: product[1],
           talla: product[2]
         }],
@@ -193,20 +192,28 @@ export const addBill = async (data, dataBill) => {
     } else {
       updateDoc(docRef2, {
         historialDeVentas: [...product[0].historialDeVentas, {
-          fechaDeVenta: Timestamp.fromDate(new Date()),
+          fechaDeVenta: new Date().toLocaleDateString(),
           cantidadVendida: product[1]
         }],
         cantidad: product[0].cantidad - product[1]
       })
     }
-    products = [...products, product[0]]
+    products = [...products, {
+      id: product[0].id,
+      ref: product[0].ref,
+      nombre: product[0].nombre,
+      precio: product[0].precio,
+      cantidadVendida: parseInt(product[1]),
+      talla: product[2],
+      images: product[0].images
+    }]
   })
   try {
     const docRef = collection(db, docBills)
     const docSnap = await addDoc(docRef, {
       ...dataBill,
       productosVendidos: products,
-      fechaDeFacturacion: serverTimestamp()
+      fechaDeFacturacion: new Date().toLocaleDateString()
     })
 
     console.log('se agrego un producto con el ID: ', docSnap.id)
@@ -220,4 +227,20 @@ export const addBill = async (data, dataBill) => {
   })
 
   console.log('products', products)
+}
+
+export const getBill = async (numberFac) => {
+  const q = query(collection(db, docBills), where('numeroDeFacturacion', '==', numberFac))
+
+  const querySnapshot = await getDocs(q)
+  const data = []
+  try {
+    querySnapshot.forEach((doc) => {
+      data.push({ ...doc.data(), id: doc.id })
+    })
+  } catch (e) {
+    console.error('Error en el servicio', e)
+  }
+
+  return data
 }

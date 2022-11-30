@@ -1,26 +1,15 @@
 import { FiSearch } from 'react-icons/fi'
 import Return from '../../components/Return'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { getCollection, docProducts, increaseQuantity } from '../../utils/firebase'
 import Popup from 'reactjs-popup'
 import { AiOutlineClose } from 'react-icons/ai'
 import { useForm } from 'react-hook-form'
 import { toastify } from '../../utils/toastify'
 
-const index = () => {
-  const [products, setProducts] = useState([])
+const index = ({ products }) => {
   const [submit, setSubmit] = useState(false)
   const { register, handleSubmit, reset, setValue } = useForm()
-
-  useEffect(() => {
-    readProducts()
-    console.log(products)
-  }, [submit])
-
-  const readProducts = async () => {
-    const data = await getCollection(docProducts)
-    setProducts(data)
-  }
 
   const onSubmit = (e) => {
     increaseQuantity(e)
@@ -283,6 +272,11 @@ const index = () => {
       `}</style>
     </div>
   )
+}
+
+export async function getServerSideProps () {
+  const products = await getCollection(docProducts)
+  return { props: { products } }
 }
 
 export default index

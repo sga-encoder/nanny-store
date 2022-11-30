@@ -1,32 +1,24 @@
-import { useRouter } from 'next/router'
 import Form from '../../../components/Form'
 import { useEffect, useState } from 'react'
 import { getDocument, docProducts, addImagesProduct, updateProduct, deleteImages } from '../../../utils/firebase'
-import { toastify } from '../../utils/toastify'
+import { toastify } from '../../../utils/toastify'
 import Return from '../../../components/Return'
+import { useRouter } from 'next/router'
 
-const actualizar = () => {
+const actualizar = ({ productData }) => {
   const router = useRouter()
   const { id } = router.query
 
   const [product, setProduct] = useState({})
-
-  const readProduct = async () => {
-    const data = await getDocument(docProducts, id)
-    setProduct(data)
-  }
+  const [change, setChange] = useState(false)
 
   useEffect(() => {
-    if (id === undefined) {
-      console.log('no hemos optenido el id')
-    } else {
-      readProduct()
-      console.log(product)
-    }
+    setProduct(productData)
   }, [])
 
   const handleChange = (e) => {
     const { name, value } = e.target
+    setChange(true)
     setProduct({
       ...product,
       [name]: value
@@ -123,8 +115,10 @@ const actualizar = () => {
             <Form
               functionHandleChange={handleChange}
               functionHandleSubmit={handleSubmit}
-              data={product}
+              data={productData}
+              data2={product}
               update={true}
+              change={change}
             />
           </div>
           : null
@@ -142,6 +136,12 @@ const actualizar = () => {
     </div>
 
   )
+}
+
+export async function getServerSideProps (context) {
+  const { id } = context.query
+  const productData = await getDocument(docProducts, id)
+  return { props: { productData } }
 }
 
 export default actualizar

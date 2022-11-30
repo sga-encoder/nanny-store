@@ -1,15 +1,18 @@
 import { useForm } from 'react-hook-form'
 import { useEffect, useState } from 'react'
 
-const Form = ({ functionHandleChange, functionHandleSubmit, data, update }) => {
+const Form = ({ functionHandleChange, functionHandleSubmit, data, data2, change, update }) => {
   const { register, handleSubmit, setValue } = useForm()
-  const [getId, setGetId] = useState(false)
   const [categoria, setCategoria] = useState('')
   const [subcategoria, setSubcategoria] = useState('')
 
   useEffect(() => {
     if (update) {
-      setValue('categoria', data.categoria)
+      if (change) {
+        setValue('categoria', data2.categoria)
+      } else {
+        setValue('categoria', data.categoria)
+      }
       setValue('subcategoria', data.subcategoria)
       setValue('ref', data.ref)
       setValue('nombre', data.nombre)
@@ -28,21 +31,25 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, update }) => {
         setValue('XXL', data.cantidad.XXL)
       }
       setValue('genero', data.genero)
-    } else {
-      setValue('ref', `${categoria}${subcategoria}`)
     }
-  }, [getId, categoria])
+  }, [categoria])
 
   useEffect(() => {
-    setValue('ref', `${categoria}${subcategoria}`)
+    if (!update) {
+      setValue('ref', `${categoria}${subcategoria}`)
+    } else {
+      if (change) {
+        setValue('ref', `${categoria}${subcategoria}`)
+      }
+    }
   }, [categoria, subcategoria])
 
   const onSubmit = (data) => {
     functionHandleSubmit(data)
   }
 
-  const switchSubcategory = () => {
-    switch (data.categoria) {
+  const switchSubcategory = (e) => {
+    switch (e.categoria) {
       case 'accesorio':
         return (
           <>
@@ -212,7 +219,7 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, update }) => {
           onChange={handleChange}
         >
           <option defaultValue>-- selecione la subcategoria --</option>
-          {switchSubcategory()}
+          {switchSubcategory(change ? data2 : data)}
         </select>
 
         <div className="input-group mb-3">
@@ -407,17 +414,6 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, update }) => {
         </div>
 
       </form>
-      {
-        update &&
-          <div className="d-grid gap-2">
-            <button
-                className='btn btn-secondary mt-3'
-                onClick={() => setGetId(!getId)}
-              >
-                Cargar datos
-              </button>
-          </div>
-      }
       <style jsx>{`
         .img-form
         {

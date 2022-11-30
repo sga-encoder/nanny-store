@@ -1,23 +1,10 @@
 import Return from '../../components/Return'
-import { useEffect, useState } from 'react'
 import { getCollection, docBills } from '../../utils/firebase'
 import { BsEye, BsFillCloudArrowDownFill } from 'react-icons/bs'
 import Link from 'next/link'
 import { zeroAdd } from '../../utils/zeroAdd'
 
-const index = () => {
-  const [bills, setBills] = useState([])
-
-  useEffect(() => {
-    readBills()
-    console.log(bills)
-  }, [])
-
-  const readBills = async () => {
-    const data = await getCollection(docBills)
-    setBills(data)
-  }
-
+const index = ({ bills }) => {
   return (
     <div className='container container-center'>
       <h2>Lista de Facturas</h2>
@@ -69,8 +56,7 @@ const index = () => {
                   </th>
                   <td>
                     <div className='table-content-center'>
-                      {new Date(fechaDeFacturacion.seconds * 1000).toLocaleDateString()}
-
+                      {fechaDeFacturacion}
                     </div>
                   </td>
                   <td>
@@ -177,6 +163,16 @@ const index = () => {
       `}</style>
     </div>
   )
+}
+
+export async function getServerSideProps () {
+  const bills = await getCollection(docBills)
+
+  return {
+    props: {
+      bills
+    }
+  }
 }
 
 export default index
