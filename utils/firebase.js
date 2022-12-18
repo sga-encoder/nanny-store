@@ -65,15 +65,31 @@ export const updateProduct = async (data, id) => {
   await updateDoc(docRef, data)
 }
 
+export const getProduct = async (ref) => {
+  const q = query(collection(db, docProducts), where('ref', '==', ref))
+
+  const querySnapshot = await getDocs(q)
+  const data = []
+  try {
+    querySnapshot.forEach((doc) => {
+      data.push({ ...doc.data(), id: doc.id })
+    })
+  } catch (e) {
+    console.error('Error en el servicio', e)
+  }
+
+  return data
+}
+
 export const deleteProduct = async (id, url) => {
   const deleteInfo = await deleteDoc(doc(db, docProducts, id))
   deleteImages(url)
   console.log(deleteInfo)
 }
 
-export const increaseQuantity = async (data) => {
+export const increaseQuantity = async (data, categoria) => {
   const docRef = doc(db, docProducts, data.id)
-  if (data.incrementar === 0) {
+  if (categoria === 'ropa') {
     await updateDoc(docRef, {
       ultimaModificacion: new Date().toLocaleDateString(),
       cantidad: {
@@ -183,8 +199,9 @@ export const addBill = async (data, dataBill) => {
     if (product[0].categoria === 'ropa') {
       updateDoc(docRef2, {
         historialDeVentas: [...product[0].historialDeVentas, {
+          numeroDeFacturacion: dataBill.numeroDeFacturacion,
           fechaDeVenta: new Date().toLocaleDateString(),
-          cantidadVendida: product[1],
+          cantidadVendida: parseInt(product[1]),
           talla: product[2]
         }],
         cantidad: operationSize(product[2])
@@ -192,10 +209,11 @@ export const addBill = async (data, dataBill) => {
     } else {
       updateDoc(docRef2, {
         historialDeVentas: [...product[0].historialDeVentas, {
+          numeroDeFacturacion: dataBill.numeroDeFacturacion,
           fechaDeVenta: new Date().toLocaleDateString(),
-          cantidadVendida: product[1]
+          cantidadVendida: parseInt(product[1])
         }],
-        cantidad: product[0].cantidad - product[1]
+        cantidad: product[0].cantidad - parseInt(product[1])
       })
     }
     products = [...products, {
@@ -204,8 +222,10 @@ export const addBill = async (data, dataBill) => {
       nombre: product[0].nombre,
       precio: product[0].precio,
       cantidadVendida: parseInt(product[1]),
+      categoria: product[0].categoria,
       talla: product[2],
-      images: product[0].images
+      images: product[0].images,
+      total: product[0].precio * parseInt(product[1])
     }]
   })
   try {

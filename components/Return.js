@@ -10,7 +10,7 @@ const Return = ({ href }) => {
       <style jsx>{`
           .esquina
           {
-            position: absolute;
+            position: fixed;
             top: 1%;
             left: 1%;
           }

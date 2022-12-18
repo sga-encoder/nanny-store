@@ -3,8 +3,14 @@ import { getCollection, docBills } from '../../utils/firebase'
 import { BsEye, BsFillCloudArrowDownFill } from 'react-icons/bs'
 import Link from 'next/link'
 import { zeroAdd } from '../../utils/zeroAdd'
+import PDF from '../../components/PDF'
+import { PDFDownloadLink } from '@react-pdf/renderer'
+import { useState, useEffect } from 'react'
 
-const index = ({ bills }) => {
+const FacVer = ({ bills }) => {
+  const [render, setRender] = useState(false)
+  useEffect(() => { setRender(!render) }, [])
+
   return (
     <div className='container container-center'>
       <h2>Lista de Facturas</h2>
@@ -47,56 +53,66 @@ const index = ({ bills }) => {
 
           <tbody>
             {
-              bills.map(({ id, numeroDeFacturacion, fechaDeFacturacion, nombre, telefono, productosVendidos }) => (
-                <tr key={id}>
-                  <th scope="row">
-                    <div className='table-content-center'>
-                      {zeroAdd(numeroDeFacturacion)}
-                    </div>
-                  </th>
-                  <td>
-                    <div className='table-content-center'>
-                      {fechaDeFacturacion}
-                    </div>
-                  </td>
-                  <td>
-                    <div className='table-content-center'>
-                      {nombre}
-                    </div>
-                  </td>
-                  <td>
-                    <div className='table-content-center'>
-                      {telefono}
-                    </div>
-                  </td>
-                  <td>
-                    {
-                      productosVendidos.map((productos) => (
-                        <img
-                          key={productos.id}
-                          className="img-table"
-                          src={productos.images}
-                          alt={productos.nombre}
-                        />
-                      ))
-                    }
-                  </td>
-                  <td>
-                    <div className='table-content-center'>
-                      <Link href={`/fac/ver/${zeroAdd(numeroDeFacturacion)}`}>
-                        <a className='btn btn-dark m-2'>
-                          <BsEye />
-                        </a>
-                      </Link>
-                      <Link href={`/crud/actualizar/${id}`}>
-                        <a className='btn btn-light m-2'>
-                          <BsFillCloudArrowDownFill />
-                        </a>
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))
+              bills.map((bill) => {
+                const { id, numeroDeFacturacion, fechaDeFacturacion, nombre, telefono, productosVendidos } = bill
+                return (
+                  <tr key={id}>
+                    <th scope="row">
+                      <div className='table-content-center'>
+                        {zeroAdd(numeroDeFacturacion)}
+                      </div>
+                    </th>
+                    <td>
+                      <div className='table-content-center'>
+                        {fechaDeFacturacion}
+                      </div>
+                    </td>
+                    <td>
+                      <div className='table-content-center'>
+                        {nombre}
+                      </div>
+                    </td>
+                    <td>
+                      <div className='table-content-center'>
+                        {telefono}
+                      </div>
+                    </td>
+                    <td>
+                      {
+                        productosVendidos.map((productos) => (
+                          <img
+                            key={productos.id}
+                            className="img-table"
+                            src={productos.images}
+                            alt={productos.nombre}
+                          />
+                        ))
+                      }
+                    </td>
+                    <td>
+                      <div className='table-content-center'>
+                        <Link href={`/fac/ver/${zeroAdd(numeroDeFacturacion)}`}>
+                          <a className='btn btn-dark m-2'>
+                            <BsEye />
+                          </a>
+                        </Link>
+                        <button className='btn btn-light m-2'>
+                          {
+                            render
+                              ? <PDFDownloadLink document={<PDF billData={bill} />} filename={`factura N ${zeroAdd(numeroDeFacturacion)}`}>
+                                  <button >
+                                    <BsFillCloudArrowDownFill />
+                                  </button>
+                                </PDFDownloadLink>
+                              : null
+                          }
+
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })
             }
           </tbody>
         </table>
@@ -175,4 +191,4 @@ export async function getServerSideProps () {
   }
 }
 
-export default index
+export default FacVer

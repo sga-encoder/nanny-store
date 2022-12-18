@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { addImagesProduct, addProducts } from '../../utils/firebase'
-import Form from '../../components/Form'
+import { addImagesProduct, addProducts } from '../utils/firebase'
+import Form from './Form'
 import { useRouter } from 'next/router'
-import Return from '../../components/Return'
-import { toastify } from '../../utils/toastify'
+import { toastify } from '../utils/toastify'
+import { TiTimes } from 'react-icons/ti'
 
-const create = () => {
+const Crear = ({ close }) => {
   const [formData, setFormData] = useState({
     categoria: '',
     subcategoria: ''
@@ -79,17 +79,54 @@ const create = () => {
   }
 
   return (
-    <div className="container">
-      <div className="container">
-        <h3 className='text-center m-3'>Agregar Producto</h3>
-        <Form
-          functionHandleChange={handleChange}
-          functionHandleSubmit={handleSubmit}
-          data={formData}
-          update={false}
-        />
+    <>
+      <div className="container-2 bg-light">
+        <div className="container">
+          <div className="container">
+            <h3 className='text-center m-3'>Agregar Producto</h3>
+            <Form
+              functionHandleChange={handleChange}
+              functionHandleSubmit={handleSubmit}
+              data={formData}
+              update={false}
+            />
+          </div>
+          <div className="btn-container">
+              <button className="btn btn-danger" onClick={() => { close() }}><TiTimes/></button>
+            </div>
+        </div>
       </div>
+      <div className="glass"></div>
       <style jsx>{`
+        .container-2
+        {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%,-50%);
+          padding: 2%;
+          width: 60%;
+          z-index: 300;
+        }
+        
+        .glass
+        {
+          width: 100%;
+          height: 100vh;
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index:200;
+          backdrop-filter: blur(5px);
+        }
+
+        .btn-container
+        {
+          position: absolute;
+          top: 2%;
+          left: 2%;
+        }
+
         div>div
         {
           display: flex;
@@ -98,9 +135,8 @@ const create = () => {
           flex-direction: column;
         }  
       `}</style>
-      <Return href='/crud' />
-    </div>
+    </>
   )
 }
 
-export default create
+export default Crear

@@ -102,19 +102,19 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, data2, change,
     if (name === 'categoria') {
       switch (value) {
         case 'accesorio':
-          setCategoria('AC')
+          setCategoria('ac')
           setSubcategoria('')
           break
         case 'belleza':
-          setCategoria('BE')
+          setCategoria('be')
           setSubcategoria('')
           break
         case 'ropa':
-          setCategoria('RO')
+          setCategoria('ro')
           setSubcategoria('')
           break
         case 'fragancia':
-          setCategoria('FR')
+          setCategoria('fr')
           setSubcategoria('')
           break
         default:
@@ -123,72 +123,69 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, data2, change,
           break
       }
     } else if (name === 'subcategoria') {
-      if (categoria === 'AC') {
+      if (categoria === 'ac') {
         switch (value) {
           case 'pulsera':
-            setSubcategoria('PU')
+            setSubcategoria('pu')
             break
 
           case 'llavero':
-            setSubcategoria('LA')
+            setSubcategoria('la')
             break
 
           case 'otros':
-            setSubcategoria('OT')
+            setSubcategoria('ot')
             break
 
           default:
             setSubcategoria('')
             break
         }
-      } else if (categoria === 'BE') {
+      } else if (categoria === 'be') {
         switch (value) {
           case 'cuidado facial':
-            setSubcategoria('CF')
+            setSubcategoria('cf')
             break
           case 'otros':
-            setSubcategoria('OT')
+            setSubcategoria('ot')
             break
 
           default:
             setSubcategoria('')
             break
         }
-      } else if (categoria === 'RO') {
+      } else if (categoria === 'ro') {
         switch (value) {
           case 'camiseta':
-            setSubcategoria('CA')
+            setSubcategoria('ca')
             break
           case 'polo':
-            setSubcategoria('PO')
+            setSubcategoria('po')
             break
           case 'boxer':
-            setSubcategoria('BO')
+            setSubcategoria('bo')
             break
           case 'medias':
-            setSubcategoria('ME')
+            setSubcategoria('me')
             break
           case 'otros':
-            setSubcategoria('OT')
+            setSubcategoria('ot')
             break
           default:
             setSubcategoria('')
             break
         }
-      } else if (categoria === 'FR') {
+      } else if (categoria === 'fr') {
         switch (value) {
           case 'perfume':
-            setSubcategoria('PE')
+            setSubcategoria('pe')
             break
-
           case 'splash':
-            setSubcategoria('SP')
+            setSubcategoria('sp')
             break
-
           case 'otros':
-            setSubcategoria('OT')
+            setSubcategoria('ot')
             break
-
           default:
             setSubcategoria('')
             break

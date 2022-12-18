@@ -1,14 +1,10 @@
-import Form from '../../../components/Form'
+import Form from './Form'
 import { useEffect, useState } from 'react'
-import { getDocument, docProducts, addImagesProduct, updateProduct, deleteImages } from '../../../utils/firebase'
-import { toastify } from '../../../utils/toastify'
-import Return from '../../../components/Return'
-import { useRouter } from 'next/router'
+import { addImagesProduct, updateProduct, deleteImages } from '../utils/firebase'
+import { toastify } from '../utils/toastify'
+import { TiTimes } from 'react-icons/ti'
 
-const actualizar = ({ productData }) => {
-  const router = useRouter()
-  const { id } = router.query
-
+const Actualizar = ({ productData, close }) => {
   const [product, setProduct] = useState({})
   const [change, setChange] = useState(false)
 
@@ -53,14 +49,12 @@ const actualizar = ({ productData }) => {
                   XXL: parseInt(data.XXL)
                 }
               }
-              updateProduct(dataProduct, id)
+              updateProduct(dataProduct, productData.id)
               toastify('El producto se actualizar correctamente', 'success')
-              router.push('/crud')
             } else {
               const dataProduct = { ...data, images: urlImages }
-              updateProduct(dataProduct, id)
+              updateProduct(dataProduct, productData.id)
               toastify('El producto se actualizar correctamente', 'success')
-              router.push('/crud')
             }
           } catch (e) {
             console.log(e)
@@ -90,13 +84,11 @@ const actualizar = ({ productData }) => {
               XXL: parseInt(data.XXL)
             }
           }
-          updateProduct(dataProduct, id)
+          updateProduct(dataProduct, productData.id)
           toastify('El producto se actualizar correctamente', 'success')
-          router.push('/crud')
         } else {
-          updateProduct(data, id)
+          updateProduct(data, productData.id)
           toastify('El producto se actualizar correctamente', 'success')
-          router.push('/crud')
         }
       } catch (e) {
         console.log(e)
@@ -106,11 +98,10 @@ const actualizar = ({ productData }) => {
   }
 
   return (
-
-    <div className="container">
-      {
-        id !== undefined
-          ? <div className="container">
+    <>
+      <div className='container-2 bg-light'>
+        <div className="container">
+          <div className="container">
             <h3 className='text-center m-3'>Actualizar Producto</h3>
             <Form
               functionHandleChange={handleChange}
@@ -121,9 +112,42 @@ const actualizar = ({ productData }) => {
               change={change}
             />
           </div>
-          : null
-      }
+        </div>
+        <div className="btn-container">
+          <button className="btn btn-danger" onClick={() => { close() }}><TiTimes/></button>
+        </div>
+      </div>
+      <div className="glass"></div>
       <style jsx>{`
+        .container-2
+        {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%,-50%);
+          padding: 2%;
+          width: 60%;
+          z-index: 300;
+        }
+        
+        .glass
+        {
+          width: 100%;
+          height: 100vh;
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index:200;
+          backdrop-filter: blur(5px);
+        }
+
+        .btn-container
+        {
+          position: absolute;
+          top: 2%;
+          left: 2%;
+        }
+        
         div>div
         {
           display: flex;
@@ -132,16 +156,9 @@ const actualizar = ({ productData }) => {
           flex-direction: column;
         }  
       `}</style>
-      <Return href='/crud' />
-    </div>
+    </>
 
   )
 }
 
-export async function getServerSideProps (context) {
-  const { id } = context.query
-  const productData = await getDocument(docProducts, id)
-  return { props: { productData } }
-}
-
-export default actualizar
+export default Actualizar

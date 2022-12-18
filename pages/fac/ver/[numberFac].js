@@ -3,7 +3,8 @@ import Return from '../../../components/Return'
 import { zeroAdd } from '../../../utils/zeroAdd'
 
 const NumberFac = ({ billData }) => {
-  const { nombre, numeroDeFacturacion, direccion, telefono, productosVendidos } = billData
+  const { nombre, numeroDeFacturacion, direccion, telefono, productosVendidos } = billData[0]
+  // const [totalPrice, setTotalPrice] = useState()
   return (
     <>
       <div className="container">
@@ -83,19 +84,23 @@ const NumberFac = ({ billData }) => {
                 </thead>
                 <tbody>
                   {
-                    productosVendidos.map((product) => (
-                      <tr key={product.id}>
-                        <th>{product.ref}</th>
-                        {
-                            product.categoria === 'ropa'
-                              ? <td>{product.nombre} {`(${product.talla})`}</td>
-                              : <td>{product.nombre}</td>
-                        }
-                        <td>{product.cantidadVendida}</td>
-                        <td>{product.precio}</td>
-                        <td>{product.precio * product.cantidadVendida}</td>
-                      </tr>
-                    ))
+                    productosVendidos.map(({ id, ref, categoria, nombre, talla, cantidadVendida, precio }) => {
+                      const price = cantidadVendida * precio
+                      console.log(talla)
+                      return (
+                        <tr key={id}>
+                          <th>{ref}</th>
+                          {
+                            categoria === 'ropa'
+                              ? <td><span>{nombre}</span> (<span>{talla}</span>)</td>
+                              : <td>{nombre}</td>
+                          }
+                          <td>{cantidadVendida}</td>
+                          <td>{precio}</td>
+                          <td>{price}</td>
+                        </tr>
+                      )
+                    })
                   }
                 </tbody>
               </table>
@@ -106,25 +111,15 @@ const NumberFac = ({ billData }) => {
       </div>
       <Return href={'/fac'} />
     </>
+
   )
 }
 
 export async function getServerSideProps (context) {
   const { numberFac } = context.query
-  const bill = await getBill(parseInt(numberFac))
-  console.log(bill[0].productosVendidos)
+  const billData = await getBill(parseInt(numberFac))
 
-  return {
-    props: {
-      billData: {
-        nombre: bill[0].nombre,
-        numeroDeFacturacion: bill[0].numeroDeFacturacion,
-        direccion: bill[0].direccion,
-        telefono: bill[0].telefono,
-        productosVendidos: bill[0].productosVendidos
-      }
-    }
-  }
+  return { props: { billData } }
 }
 
 export default NumberFac
