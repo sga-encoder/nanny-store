@@ -1,12 +1,12 @@
-import { getProduct } from '../../utils/firebase'
-import Return from '../../components/Return'
-import { zeroAdd } from '../../utils/zeroAdd'
+import { getProduct } from '../../../utils/firebase'
+import Return from '../../../components/Return'
+import { zeroAdd } from '../../../utils/zeroAdd'
 import { BsPencil } from 'react-icons/bs'
 import { BiTrashAlt } from 'react-icons/bi'
-import Actualizar from './../../components/Actualizar'
+import Actualizar from '../../../components/Actualizar'
 import Popup from 'reactjs-popup'
-import Eliminar from '../../components/Eliminar'
-import Agregar from './../../components/Agregar'
+import Eliminar from '../../../components/Eliminar'
+import Agregar from '../../../components/Agregar'
 
 const Ref = ({ product }) => {
   const { nombre, images, ref, precio, costo, ultimaModificacion, categoria, subcategoria, fechaDeCreacion, historialDeVentas, cantidad } = product[0]

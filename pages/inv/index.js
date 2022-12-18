@@ -32,7 +32,7 @@ const index = ({ products }) => {
                 }
 
                 return (
-                  <Link key={id} href={`/inv/${ref}`} as={`/inv/ver/${ref}`}>
+                  <Link key={id} href={`/inv/ver/${ref}`}>
                     <a className='a'>
                       <div className="col">
                         <div className="card card-content">
