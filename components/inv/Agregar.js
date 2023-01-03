@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
-import { increaseQuantity } from '../utils/firebase'
+import { increaseQuantity } from '../../utils/firebase'
 import { AiOutlineClose } from 'react-icons/ai'
-import { toastify } from '../utils/toastify'
+import { toastify } from '../../utils/toastify'
 import { TiTimes } from 'react-icons/ti'
 
 const Agregar = ({ productData, close }) => {

@@ -7,14 +7,25 @@ import Actualizar from '../../../components/Actualizar'
 import Popup from 'reactjs-popup'
 import Eliminar from '../../../components/Eliminar'
 import Agregar from '../../../components/Agregar'
+import { useRef, useState, useEffect } from 'react'
+import Navbar from './../../../components/Navbar'
 
 const Ref = ({ product }) => {
   const { nombre, images, ref, precio, costo, ultimaModificacion, categoria, subcategoria, fechaDeCreacion, historialDeVentas, cantidad } = product[0]
+  const width = useRef(null)
+  const [divWidth, setDivWidth] = useState(0)
+
+  useEffect(() => {
+    setDivWidth(width.current.clientWidth)
+    console.log(divWidth)
+  })
+
   return (
     <>
+      <Navbar />
       <h2 className='auto'>{nombre}</h2>
-      <div className='container row auto'>
-        <div className="col img-container">
+      <div ref={width} className={divWidth >= 720 ? 'container row auto' : 'container col auto'}>
+        <div className={divWidth >= 720 ? 'col img-container' : 'col img-container img-container-col'}>
           <img src={images} alt={nombre} />
         </div>
         <div className="col">
@@ -336,11 +347,21 @@ const Ref = ({ product }) => {
           padding: 5%;
         }
 
+        .img-container-col
+        {
+          width: 100%
+        }
+        
         .img-container img    
         {
           width: 100%;
           height: 100%;
           object-fit: contain;
+        }
+
+        .img-container-col img
+        {
+          margin: 0 auto;
         }
         .container-center,
         .table-content-center

@@ -1,7 +1,7 @@
-import Form from './Form'
+import FormProducts from '../Forms/FormProducts'
 import { useEffect, useState } from 'react'
-import { addImagesProduct, updateProduct, deleteImages } from '../utils/firebase'
-import { toastify } from '../utils/toastify'
+import { addImagesProduct, updateProduct, deleteImages } from '../../utils/firebase'
+import { toastify } from '../../utils/toastify'
 import { TiTimes } from 'react-icons/ti'
 
 const Actualizar = ({ productData, close }) => {
@@ -103,7 +103,7 @@ const Actualizar = ({ productData, close }) => {
         <div className="container">
           <div className="container">
             <h3 className='text-center m-3'>Actualizar Producto</h3>
-            <Form
+            <FormProducts
               functionHandleChange={handleChange}
               functionHandleSubmit={handleSubmit}
               data={productData}

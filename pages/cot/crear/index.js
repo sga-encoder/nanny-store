@@ -6,9 +6,8 @@ const index = () => {
   return (
     <>
       <Navbar />
-      <FormBills type={'fac'}/>
-      <Return href={'/fac'} />
-
+      <FormBills type={'cot'}/>
+      <Return href={'/cot'} />
     </>
   )
 }

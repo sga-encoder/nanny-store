@@ -1,12 +1,14 @@
 import { getBill } from '../../../utils/firebase'
 import Return from '../../../components/Return'
 import { zeroAdd } from '../../../utils/zeroAdd'
+import Navbar from './../../../components/Navbar'
 
 const NumberFac = ({ billData }) => {
   const { nombre, numeroDeFacturacion, direccion, telefono, productosVendidos } = billData[0]
   // const [totalPrice, setTotalPrice] = useState()
   return (
     <>
+      <Navbar />
       <div className="container">
         <div className="container">
           <h1 className='text-center'>Factura de Venta</h1>

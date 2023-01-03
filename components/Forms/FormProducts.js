@@ -1,10 +1,17 @@
 import { useForm } from 'react-hook-form'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 const Form = ({ functionHandleChange, functionHandleSubmit, data, data2, change, update }) => {
   const { register, handleSubmit, setValue } = useForm()
   const [categoria, setCategoria] = useState('')
   const [subcategoria, setSubcategoria] = useState('')
+  const width = useRef(null)
+  const [divWidth, setDivWidth] = useState(0)
+
+  useEffect(() => {
+    setDivWidth(width.current.clientWidth)
+    console.log(divWidth)
+  })
 
   useEffect(() => {
     if (update) {
@@ -196,7 +203,7 @@ const Form = ({ functionHandleChange, functionHandleSubmit, data, data2, change,
   }
 
   return (
-    <div className='container-2'>
+    <div ref={width} className={divWidth >= 400 ? 'container-2' : 'container-2 fs-5'}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <select
           className="form-select mt-2"

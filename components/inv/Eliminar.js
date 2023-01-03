@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
-import { deleteProduct } from '../utils/firebase'
-import { toastify } from '../utils/toastify'
+import { deleteProduct } from '../../utils/firebase'
+import { toastify } from '../../utils/toastify'
 import { TiTimes } from 'react-icons/ti'
 
 const Eliminar = ({ productData, close }) => {

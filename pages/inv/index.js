@@ -1,19 +1,45 @@
 import { FiSearch } from 'react-icons/fi'
 import Return from '../../components/Return'
 import { getCollection, docProducts } from '../../utils/firebase'
-import Link from 'next/link'
 import Popup from 'reactjs-popup'
-import Crear from '../../components/Crear'
+import Crear from '../../components/inv/Crear'
+import { useState } from 'react'
+import Item from './../../components/inv/Item'
+import Navbar from '../../components/Navbar'
 
 const index = ({ products }) => {
+  const [resultSearch, setResultSearch] = useState([])
+  const [search, setSearch] = useState('')
+
+  const filter = (terminoBusqueda) => {
+    // eslint-disable-next-line array-callback-return
+    const resultadosBusqueda = products.filter((product) => {
+      if (
+        product.ref.toString().toLowerCase().includes(terminoBusqueda.toString().toLowerCase()) ||
+        product.nombre.toString().toLowerCase().includes(terminoBusqueda.toString().toLowerCase()) ||
+        product.categoria.toString().toLowerCase().includes(terminoBusqueda.toString().toLowerCase()) ||
+        product.subcategoria.toString().toLowerCase().includes(terminoBusqueda.toString().toLowerCase())
+      ) {
+        return product
+      }
+    })
+    setResultSearch(resultadosBusqueda)
+  }
+
+  const handleChange = (e) => {
+    filter(e.target.value)
+    setSearch(e.target.value)
+  }
+
   return (
     <>
+      <Navbar active='inv'/>
       <div className="container">
         <h1>Inventario</h1>
         <div className="container">
           <div className="input-group md-3">
             <div className="form-floating">
-              <input type="text" className="form-control" id="search" placeholder="busca"/>
+              <input type="text" className="form-control" id="search" placeholder="buscar" onChange={handleChange} value={search}/>
               <label htmlFor="search">Busca aqui el producto</label>
             </div>
             <span className="input-group-text"><FiSearch /></span>
@@ -22,48 +48,9 @@ const index = ({ products }) => {
         <div className='container text-center'>
           <div className="row row-cols-4 card-container">
             {
-              products.map(({ id, ref, nombre, images, cantidad, categoria, subcategoria, precio }) => {
-                const cantidadTotal = () => {
-                  if (typeof cantidad === 'object') {
-                    return (parseInt(cantidad.S) + parseInt(cantidad.M) + parseInt(cantidad.L) + parseInt(cantidad.XL) + parseInt(cantidad.XXL))
-                  } else {
-                    return (cantidad)
-                  }
-                }
-
-                return (
-                  <Link key={id} href={`/inv/ver/${ref}`}>
-                    <a className='a'>
-                      <div className="col">
-                        <div className="card card-content">
-                          <img src={images} className="card-img-top" alt={nombre} />
-                          <div className="card-body">
-                            <div className="card-text">
-                              <div className="container">
-                                <div className="row">
-                                  <div className="col-12">{nombre}</div>
-                                </div>
-                                <div className="row">
-                                  <div className="col text-start fw-bold">Subcategoria:</div>
-                                  <div className="col">{subcategoria}</div>
-                                </div>
-                                <div className="row">
-                                  <div className="col text-start fw-bold">Precio:</div>
-                                  <div className="col">{precio}</div>
-                                </div>
-                                <div className="row">
-                                  <div className="col text-start fw-bold">Cantidad:</div>
-                                  <div className="col">{cantidadTotal()}</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </a>
-                  </Link>
-                )
-              })
+              search === ''
+                ? <Item array={products} />
+                : <Item array={resultSearch} />
             }
           </div>
 

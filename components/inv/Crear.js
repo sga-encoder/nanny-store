@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { addImagesProduct, addProducts } from '../utils/firebase'
-import Form from './Form'
+import { addImagesProduct, addProducts } from '../../utils/firebase'
+import FormProducts from '../Forms/FormProducts'
 import { useRouter } from 'next/router'
-import { toastify } from '../utils/toastify'
+import { toastify } from '../../utils/toastify'
 import { TiTimes } from 'react-icons/ti'
 
 const Crear = ({ close }) => {
@@ -84,7 +84,7 @@ const Crear = ({ close }) => {
         <div className="container">
           <div className="container">
             <h3 className='text-center m-3'>Agregar Producto</h3>
-            <Form
+            <FormProducts
               functionHandleChange={handleChange}
               functionHandleSubmit={handleSubmit}
               data={formData}

@@ -7,7 +7,9 @@ export const db = getFirestore(app)
 export const storage = getStorage(app)
 export const docProducts = 'productos'
 export const docBills = 'facturas'
+export const docQuote = 'cotizaciones'
 export const varNumberBill = ['variables', 'facturas']
+export const varNumberQuote = ['variables', 'cotizaciones']
 
 // -------------------------------------------------
 // -                                               -
@@ -263,4 +265,174 @@ export const getBill = async (numberFac) => {
   }
 
   return data
+}
+
+// -------------------------------------------------
+// -                                               -
+// -                Cotizaciones                   -
+// -                                               -
+// -------------------------------------------------
+export const getNumberQuote = async () => {
+  const docRef = doc(db, varNumberQuote[0], varNumberQuote[1])
+  const querySnapshot = await getDoc(docRef)
+
+  if (querySnapshot.exists()) {
+    return querySnapshot.data()
+  } else {
+    console.log('no pudimos encontrar el documento')
+  }
+}
+
+export const addQuote = async (data, dataQuote) => {
+  let products = []
+
+  data.forEach((product) => {
+    products = [...products, {
+      id: product[0].id,
+      ref: product[0].ref,
+      nombre: product[0].nombre,
+      precio: product[0].precio,
+      cantidadVendida: parseInt(product[1]),
+      categoria: product[0].categoria,
+      talla: product[2],
+      images: product[0].images,
+      total: product[0].precio * parseInt(product[1])
+    }]
+  })
+  try {
+    const docRef = collection(db, docQuote)
+    const docSnap = await addDoc(docRef, {
+      ...dataQuote,
+      productosCotizados: products,
+      fechaDeCotizacion: new Date().toLocaleDateString()
+    })
+
+    console.log('se agrego un producto con el ID: ', docSnap.id)
+  } catch (e) {
+    console.error('Error en el servicio: ', e)
+  }
+
+  const docRef3 = doc(db, varNumberQuote[0], varNumberQuote[1])
+  await updateDoc(docRef3, {
+    numeroDeCotizacion: dataQuote.numeroDeCotizacion
+  })
+
+  console.log('products', products)
+}
+
+export const getQuote = async (numberQuo) => {
+  const q = query(collection(db, docQuote), where('numeroDeCotizacion', '==', numberQuo))
+
+  const querySnapshot = await getDocs(q)
+  const data = []
+  try {
+    querySnapshot.forEach((doc) => {
+      data.push({ ...doc.data(), id: doc.id })
+    })
+  } catch (e) {
+    console.error('Error en el servicio', e)
+  }
+
+  return data
+}
+
+export const payQuote = async (pay, abono, id) => {
+  const docRef = doc(db, docQuote, id)
+  await updateDoc(docRef, { abono: parseInt(pay) + parseInt(abono) })
+}
+
+export const quoteToBill = async (dataQuote, pay) => {
+  const numberBillData = await getNumberBill()
+
+  payQuote(pay, dataQuote.abono, dataQuote.id)
+
+  dataQuote.productosCotizados.forEach(async (product) => {
+    const docRef2 = doc(db, docProducts, product.id)
+    const dataProduct = await getProduct(product.ref)
+    const operationSize = (size) => {
+      switch (size) {
+        case 'S':
+          return {
+            S: dataProduct[0].cantidad.S - product.cantidadVendida,
+            M: dataProduct[0].cantidad.M,
+            L: dataProduct[0].cantidad.L,
+            XL: dataProduct[0].cantidad.XL,
+            XXL: dataProduct[0].cantidad.XXL
+          }
+        case 'M':
+          return {
+            S: dataProduct[0].cantidad.S,
+            M: dataProduct[0].cantidad.M - product.cantidadVendida,
+            L: dataProduct[0].cantidad.L,
+            XL: dataProduct[0].cantidad.XL,
+            XXL: dataProduct[0].cantidad.XXL
+          }
+        case 'L':
+          return {
+            S: dataProduct[0].cantidad.S,
+            M: dataProduct[0].cantidad.M,
+            L: dataProduct[0].cantidad.L - product.cantidadVendida,
+            XL: dataProduct[0].cantidad.XL,
+            XXL: dataProduct[0].cantidad.XXL
+          }
+        case 'XL':
+          return {
+            S: dataProduct[0].cantidad.S,
+            M: dataProduct[0].cantidad.M,
+            L: dataProduct[0].cantidad.L,
+            XL: dataProduct[0].cantidad.XL - product.cantidadVendida,
+            XXL: dataProduct[0].cantidad.XXL
+          }
+        case 'XXL':
+          return {
+            S: dataProduct[0].cantidad.S,
+            M: dataProduct[0].cantidad.M,
+            L: dataProduct[0].cantidad.L,
+            XL: dataProduct[0].cantidad.XL,
+            XXL: dataProduct[0].cantidad.XXL - product.cantidadVendida
+          }
+      }
+    }
+
+    if (dataProduct[0].categoria === 'ropa') {
+      updateDoc(docRef2, {
+        historialDeVentas: [...dataProduct[0].historialDeVentas, {
+          numeroDeFacturacion: numberBillData.numeroDeFacturacion + 1,
+          fechaDeVenta: new Date().toLocaleDateString(),
+          cantidadVendida: parseInt(product.cantidadVendida),
+          talla: product.talla
+        }],
+        cantidad: operationSize(product.talla)
+      })
+    } else {
+      updateDoc(docRef2, {
+        historialDeVentas: [...dataProduct[0].historialDeVentas, {
+          numeroDeFacturacion: numberBillData.numeroDeFacturacion + 1,
+          fechaDeVenta: new Date().toLocaleDateString(),
+          cantidadVendida: parseInt(product.cantidadVendida)
+        }],
+        cantidad: dataProduct[0].cantidad - parseInt(product.cantidadVendida)
+      })
+    }
+  })
+  try {
+    const docRef = collection(db, docBills)
+    const docSnap = await addDoc(docRef, {
+      nombre: dataQuote.nombre,
+      direccion: dataQuote.direccion,
+      numeroDeFacturacion: numberBillData.numeroDeFacturacion + 1,
+      productosVendidos: dataQuote.productosCotizados,
+      fechaDeFacturacion: new Date().toLocaleDateString(),
+      telefono: dataQuote.telefono
+    })
+
+    console.log('se agrego un producto con el ID: ', docSnap.id)
+  } catch (e) {
+    console.error('Error en el servicio: ', e)
+  }
+
+  const docRef3 = doc(db, varNumberBill[0], varNumberBill[1])
+  await updateDoc(docRef3, {
+    numeroDeFacturacion: numberBillData.numeroDeFacturacion + 1
+  })
 }

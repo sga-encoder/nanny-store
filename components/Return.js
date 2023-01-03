@@ -11,7 +11,7 @@ const Return = ({ href }) => {
           .esquina
           {
             position: fixed;
-            top: 1%;
+            top: 10%;
             left: 1%;
           }
         `}</style>
